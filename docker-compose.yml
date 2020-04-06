@@ -1,0 +1,44 @@
+version: '3'
+services:
+  web:
+    image: nginx:1.17
+    ports:
+      - 80:80
+    volumes:
+      - .:/var/www
+      - ./DockerFiles/site.conf:/etc/nginx/conf.d/site.conf
+    depends_on:
+      - php
+  php:
+    image: php:7.4.4-fpm
+    depends_on:
+      - redis
+      - mysql
+      - memcached
+    links:
+      - redis
+      - mysql
+      - memcached
+    volumes:
+      - .:/var/www
+      - composer:/root/.composer
+  mysql:
+    image: mysql:5.7.29
+    volumes:
+      - mysql_data_dir:/var/lib/mysql
+      - mysql_logs:/var/log/mysql
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: 00
+  memcached:
+    image: memcached
+  redis:
+    image: redis:5.0.3
+    volumes:
+      - redis:/data
+volumes:
+  mysql_data_dir: {}
+  mysql_logs: {}
+  composer: {}
+  redis: {}
